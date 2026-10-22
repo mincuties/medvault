@@ -34,3 +34,8 @@ h1 small { font-size: 15px; color: #66758a; font-weight: 500; }
 .banner { background: #fbeaea; border: 1px solid #f1c4c5; padding: 8px 12px; border-radius: 6px; }
 .small-print { font-size: 12px; margin-bottom: 0; }
 .plain { margin-top: 8px; }
+.arch { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; }
+.arch .box { flex: 1 1 180px; border: 1px solid #c9d3df; border-radius: 8px; padding: 10px; font-weight: 600; }
+.arch .box small { display: block; font-weight: 400; color: #66758a; margin-top: 4px; }
+.arch .box.tide { border-color: #0b7a6f; background: #eefaf5; }
+.arch .arrow { align-self: center; color: #66758a; font-size: 20px; }

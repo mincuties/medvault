@@ -36,6 +36,16 @@ export default function Home() {
         <div className="card"><b>2 · Doctor</b><p className="muted">Requests access. Reads only after the patient signs a grant.</p></div>
         <div className="card"><b>3 · Hospital admin</b><p className="muted">Holds the whole database, and still cannot decrypt.</p></div>
       </div>
+      <div className="card">
+        <h3>Where the key lives</h3>
+        <div className="arch">
+          <div className="box">Browser<small>encrypts / decrypts, signs grants in the Tide enclave</small></div>
+          <div className="arrow">⇄</div>
+          <div className="box">MedVault server<small>ciphertext + signed policies only. No key.</small></div>
+          <div className="arrow">⇄</div>
+          <div className="box tide">Tide network<small>20 independent nodes each hold a key share and check the patient&apos;s policy</small></div>
+        </div>
+      </div>
     </main>
   );
 }

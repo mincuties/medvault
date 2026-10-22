@@ -6,25 +6,25 @@ MedVault is a medical record vault where a patient's file opens only when the pa
 
 ## Vision & originality
 
-Patients own their health records, not the hospital's IT team. A doctor gets access to one record, for one visit (24 hours), because the patient signed for it. The approval is not a row in our database: it is a cryptographic policy the Tide network checks on every decryption.
+Patients own their health records, not the hospital IT team. A doctor gets one record, for one visit (24 hours), because the patient signed for it. The approval is not a database row: it is a cryptographic policy the Tide network checks on every decryption.
 
 ## Trust constraint insight
 
-Today, whoever runs the database can read every record: admins, insiders, vendors, and attackers who steal admin credentials. So patients hold back sensitive history and clinics avoid sharing records. If nobody can open records alone, patients can share everything safely.
+Today, whoever runs the database can read every record: admins, insiders, vendors, and attackers with stolen admin credentials. So patients hold back sensitive history and clinics avoid sharing records. If nobody can open records alone, patients can share everything safely.
 
 ## Value & impact
 
-A patient with an HIV or mental health history can store it once and share it with a new specialist in seconds, knowing hospital staff can't browse it, and can see in an access log every request, approval and read.
+A patient with an HIV or mental health history stores it once and shares it with a new specialist in seconds, knowing hospital staff cannot browse it, and sees every request, approval and read in an access log.
 
 ## Why TideCloak matters
 
-Each record is encrypted in the patient's browser by the Tide network, under a policy using Tide's built-in `RelationshipAttestation:1` contract with the record's id as its only tag. When the patient approves a doctor, the patient signs (in the Tide enclave) a policy naming **that doctor's Tide key, that record, read-only, expiring in 24 hours**. Tide's independent nodes release a decryption only when the caller's token, its `_tide_decryptor` role and that signed policy all match. There is no master key on our server. The hospital admin holds the entire database, signed policies included, and replaying the doctor's policy is still refused by the network. Ordinary login can't promise this, because whoever runs the database can read it. Tokens are DPoP-bound and verified server side.
+Records are encrypted in the patient's browser under Tide's built-in `RelationshipAttestation:1` policy, tagged with the record id. To approve a doctor, the patient signs in the Tide enclave a policy naming that doctor's Tide key, that record, read-only, for 24 hours. Tide's independent nodes decrypt only when token, `_tide_decryptor` role and signed policy all match. Our server has no key: the hospital admin holds the whole database, policies included, and replaying the doctor's policy is still refused. Ordinary login cannot promise this.
 
 ## Prototype & storytelling
 
-Patient uploads a record (signs a policy, then the data is encrypted before it leaves the browser). The doctor requests access, the patient approves by signing a grant, and the doctor decrypts and reads it. Then the hospital admin opens the same record, sees only ciphertext, and their decrypt attempt is refused by the Tide network.
+Patient encrypts and uploads a record. Doctor requests access, patient approves by signing a grant, doctor decrypts and reads it. The hospital admin opens the same record, sees only ciphertext, and is refused by the Tide network.
 
-**Honest notes:** in this demo realm the patient is also the realm's `tide-realm-admin`, because signing a Tide policy needs that authority. In production each patient's grants would be signed through a governed approver flow. Revoking deletes the stored grant so the app stops handing it out; a 24-hour expiry bounds a copy that was kept.
+Honest notes: in this demo realm the patient is also the realm's `tide-realm-admin`, because signing a Tide policy needs that authority; production would use a governed approver flow. Revoke stops the app handing out the grant; the 24-hour expiry bounds a kept copy. See [docs/flow.md](docs/flow.md).
 
 ## Build status (22 Oct 2026)
 
