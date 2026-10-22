@@ -19,7 +19,7 @@ export default function Admin() {
       const [out] = await doDecrypt([{ encrypted: r.ciphertext, tags: [r.id] }], stolen ? fromB64(stolen.policy) : undefined);
       setResult((x) => ({ ...x, [r.id]: { ok: true, text: typeof out === "string" ? out : new TextDecoder().decode(out) } }));
     } catch (e) {
-      setResult((x) => ({ ...x, [r.id]: { ok: false, text: `Refused by the Tide network: ${tideError(e)}` } }));
+      setResult((x) => ({ ...x, [r.id]: { ok: false, text: `🔒 Access denied by the Tide network, as designed. The hospital admin is not named in any patient-signed policy (${e?.cause?.message || e?.cause || e?.message}).` } }));
       post({ action: "attempt", recordId: r.id });
     }
   }
