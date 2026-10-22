@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
-import { useTideCloak } from "@tidecloak/nextjs";
+import { useTide } from "@/lib/tide";
 import Shell from "../Shell";
 import { useVault, fromB64, tideError } from "@/lib/useVault";
 
 export default function Admin() {
-  const { doDecrypt, hasRealmRole, authenticated } = useTideCloak();
+  const { doDecrypt, hasRealmRole, authenticated } = useTide();
   const { data, post } = useVault();
   const [result, setResult] = useState({});
 

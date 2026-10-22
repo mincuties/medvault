@@ -1,15 +1,15 @@
 "use client";
 import { useState } from "react";
-import { useTideCloak } from "@tidecloak/nextjs";
+import { useTide } from "@/lib/tide";
 import Shell from "../Shell";
-import { useVault, fetchAdminPolicy, vendorId, fromB64, tideError } from "@/lib/useVault";
-import { signRelationshipPolicy } from "@/lib/tide/relationship";
+import { useVault, fromB64, tideError } from "@/lib/useVault";
+import { signGrant } from "@/lib/tide";
 import { SAMPLES } from "@/lib/samples";
 
 const DAY = 24 * 60 * 60;
 
 export default function Patient() {
-  const { doEncrypt, doDecrypt, hasRealmRole, authenticated, getValueFromToken } = useTideCloak();
+  const { doEncrypt, doDecrypt, hasRealmRole, authenticated, getValueFromToken } = useTide();
   const { data, error, setError, post } = useVault();
   const [title, setTitle] = useState(SAMPLES[0].title);
   const [text, setText] = useState(SAMPLES[0].text);
@@ -24,10 +24,7 @@ export default function Patient() {
     try {
       const id = crypto.randomUUID();
       // 1. Sign a policy that lets ME read and write this one record. Approve it in the Tide window.
-      const policy = await signRelationshipPolicy(
-        { vendorId, subject: { type: "User", id: getValueFromToken("tideuserkey") }, recordId: id, access: "read-write" },
-        await fetchAdminPolicy(),
-      );
+      const policy = await signGrant({ subject: { type: "User", id: getValueFromToken("tideuserkey") }, recordId: id, access: "read-write" });
       // 2. Encrypt in the browser under that policy. The record id is the only tag.
       const [ciphertext] = await doEncrypt([{ data: text, tags: [id] }], fromB64(policy));
       // 3. The server receives ciphertext and the signed policy, never the plaintext.
@@ -46,10 +43,7 @@ export default function Patient() {
       // The grant: a policy naming this doctor's Tide key and this record, read-only, for 24 hours.
       // The Tide network enforces it on every decryption; the hospital cannot forge or widen it.
       const expiry = Math.floor(Date.now() / 1000) + DAY;
-      const policy = await signRelationshipPolicy(
-        { vendorId, subject: { type: "User", id: q.doctorKey }, recordId: q.recordId, access: "read", expiry },
-        await fetchAdminPolicy(),
-      );
+      const policy = await signGrant({ subject: { type: "User", id: q.doctorKey }, recordId: q.recordId, access: "read", expiry });
       await post({ action: "decide", requestId: q.id, approve: true, policy, expiry });
     } catch (e) {
       setError(`Approval failed: ${tideError(e)}`);

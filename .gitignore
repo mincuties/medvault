@@ -7,3 +7,4 @@ data/*
 next-env.d.ts
 *.tsbuildinfo
 branding/
+!data/tidecloak.json

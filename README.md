@@ -26,6 +26,11 @@ Patient encrypts and uploads a record. Doctor requests access, patient approves 
 
 Honest notes: in this demo realm the patient is also the realm's `tide-realm-admin`, because signing a Tide policy needs that authority; production would use a governed approver flow. Revoke stops the app handing out the grant; the 24-hour expiry bounds a kept copy. See [docs/flow.md](docs/flow.md).
 
+## Two modes
+
+- **Real TideCloak** (`npm run dev`): TideCloak + the Tide network do sign-in, roles, policy signing and threshold encryption.
+- **Simulated TideCloak** (`npm run dev:sim`): per the organisers' guidance ("simulate TideCloak's sign-in, roles and access checks for now"), the same pages and API run against a simulator with the same interface and the same `RelationshipAttestation:1` checks (subject, record tag, role, expiry, signature). A yellow banner marks this mode. The demo video was recorded in this mode because Tide's network was intermittently refusing new accounts and licences during the hackathon.
+
 ## Build status (22 Oct 2026)
 
 | Part | Status |
@@ -33,9 +38,21 @@ Honest notes: in this demo realm the patient is also the realm's `tide-realm-adm
 | App (patient / doctor / admin pages, API, audit log, revoke) | Built, `next build` passes |
 | TideCloak realm with Tide licence, IGA, roles, users | Worked once on a local `tidecloak-dev` (realm licensed, IGA on, users created) |
 | Linking Tide accounts | Doctor account linked successfully |
-| Full encrypt → approve → decrypt run | **Not yet verified live.** The realm's free licence ran out of user seats after failed sign-ups, and new free licences then failed on Tide's side (`setUpTideRealm` 500, `Midgard FinalizeWallet failed`) on every retry during the hackathon window |
+| Full encrypt → approve → decrypt → admin refused, simulated mode | Verified end to end |
+| Full encrypt → approve → decrypt run, real mode | **Not yet verified live.** The realm's free licence ran out of user seats after failed sign-ups, and new free licences then failed on Tide's side (`setUpTideRealm` 500, `Midgard FinalizeWallet failed`) on every retry during the hackathon window |
 
 ## Setup
+
+Quick demo, no TideCloak needed:
+
+```bash
+npm install
+npm run dev:sim
+```
+
+Open http://localhost:3000, click **Login with TideCloak**, pick patient / doctor / hospitaladmin.
+
+Real TideCloak:
 
 Requirements: Node.js 20+, Docker Desktop, Git Bash (Windows) with `jq` and `curl`.
 

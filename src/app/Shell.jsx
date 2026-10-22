@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
-import { useTideCloak } from "@tidecloak/nextjs";
+import { useTide } from "@/lib/tide";
 
 export default function Shell({ title, children }) {
-  const { authenticated, isInitializing, login, logout, getValueFromIdToken } = useTideCloak();
+  const { authenticated, isInitializing, login, logout, getValueFromIdToken } = useTide();
   let body = children;
   if (isInitializing) body = <p className="muted">Loading...</p>;
   else if (!authenticated) body = <div className="card"><p>Please log in.</p><button onClick={() => login()}>Login with TideCloak</button></div>;

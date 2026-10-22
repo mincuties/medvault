@@ -1,14 +1,14 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useTideCloak } from "@tidecloak/nextjs";
+import { useTide } from "@/lib/tide";
 import Link from "next/link";
 import { roleOf } from "@/lib/useVault";
 
 const HOME = { patient: "/patient", doctor: "/doctor", "hospital-admin": "/admin" };
 
 export default function Home() {
-  const { authenticated, isInitializing, login, logout, hasRealmRole } = useTideCloak();
+  const { authenticated, isInitializing, login, logout, hasRealmRole } = useTide();
   const router = useRouter();
   const role = authenticated ? roleOf(hasRealmRole) : null;
 

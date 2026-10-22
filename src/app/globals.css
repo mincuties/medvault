@@ -39,3 +39,4 @@ h1 small { font-size: 15px; color: #66758a; font-weight: 500; }
 .arch .box small { display: block; font-weight: 400; color: #66758a; margin-top: 4px; }
 .arch .box.tide { border-color: #0b7a6f; background: #eefaf5; }
 .arch .arrow { align-self: center; color: #66758a; font-size: 20px; }
+.sim-banner { background: #fff4d6; color: #7a5a00; text-align: center; font-size: 13px; padding: 6px 12px; border-bottom: 1px solid #f0d58a; }

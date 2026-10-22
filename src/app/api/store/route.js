@@ -1,4 +1,4 @@
-import { withAuth } from "@/lib/auth/middleware";
+import { withMedVaultAuth as withAuth } from "@/lib/auth/withMedVaultAuth";
 import { load, save } from "@/lib/db";
 
 // Every call is verified: TideCloak JWT signature, expiry, and the DPoP proof binding it to the caller.
