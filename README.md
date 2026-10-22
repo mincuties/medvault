@@ -4,6 +4,8 @@
 
 MedVault is a medical record vault where a patient's file opens only when the patient approves a named doctor, and no hospital admin, vendor or AI can open it alone.
 
+**Demo video (2 min):** [demo.mp4](demo.mp4)
+
 ## Vision & originality
 
 Patients own their health records, not the hospital IT team. A doctor gets one record, for one visit (24 hours), because the patient signed for it. The approval is not a database row: it is a cryptographic policy the Tide network checks on every decryption.
