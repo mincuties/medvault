@@ -194,8 +194,8 @@ echo "==> Cleaning previous state..."
 docker stop tidecloak 2>/dev/null || true
 docker rm tidecloak 2>/dev/null || true
 mkdir -p "$PROJECT_DIR/data"
-sudo rm -f "$PROJECT_DIR/data/keycloakdb"* 2>/dev/null || true
-sudo chown -R 1000:1000 "$PROJECT_DIR/data"
+rm -f "$PROJECT_DIR/data/keycloakdb"* 2>/dev/null || true
+true # no chown needed: data is not mounted into the container
 
 if lsof -i :8080 >/dev/null 2>&1; then
   echo "ERROR: Port 8080 is already in use."
@@ -381,7 +381,7 @@ for U in doctor:Dana:Tran hospitaladmin:Alex:Le; do
   TOKEN="$(get_token)"
   curl -s -X POST "$TIDECLOAK_URL/admin/realms/$REALM_NAME/users" \
     -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
-    -d "{\"username\":\"$UN\",\"firstName\":\"$FN\",\"lastName\":\"$LN\",\"enabled\":true,\"attributes\":{\"tideInvitable\":[\"true\"]}}"
+    -d "{\"username\":\"$UN\",\"email\":\"$UN@example.org\",\"firstName\":\"$FN\",\"lastName\":\"$LN\",\"enabled\":true,\"attributes\":{\"tideInvitable\":[\"true\"]}}"
 done
 
 # Approve user creation change request before proceeding
