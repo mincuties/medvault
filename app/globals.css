@@ -20,3 +20,9 @@ textarea { min-height: 90px; }
 pre { white-space: pre-wrap; word-break: break-all; background: #0f1720; color: #9fe6c3; padding: 10px; border-radius: 6px; font-size: 12px; max-height: 140px; overflow: auto; }
 .plain { background: #eefaf5; border: 1px solid #b9e5d2; padding: 10px; border-radius: 6px; white-space: pre-wrap; }
 .error { color: #b4373b; }
+.ok { color: #126b45; }
+.badge.revoked { background: #ece3f7; color: #5b2d8a; }
+button.small { padding: 4px 10px; font-size: 12px; }
+.item { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid #eef2f7; }
+.log { font-size: 13px; padding: 4px 0; border-top: 1px solid #eef2f7; }
+h3 { margin-top: 0; }

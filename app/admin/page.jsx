@@ -38,6 +38,13 @@ export default function Admin() {
           </div>
         ))}
       </div>
+      <div className="card">
+        <h3>Access requests (metadata only)</h3>
+        {!data?.requests?.length && <p className="muted">None.</p>}
+        {data?.requests?.map((q) => (
+          <div key={q.id} className="item"><span>Dr. {q.doctor} → {q.patient}: {q.title}</span><span className={`badge ${q.status}`}>{q.status}</span></div>
+        ))}
+      </div>
     </Shell>
   );
 }

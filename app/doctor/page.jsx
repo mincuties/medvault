@@ -17,6 +17,7 @@ export default function Doctor() {
     try {
       const [text] = await doDecrypt([{ encrypted: r.ciphertext, tags: [TAG] }]);
       setPlain((p) => ({ ...p, [r.id]: text }));
+      post({ action: "viewed", recordId: r.id });
     } catch (e) {
       setError(`Decryption refused: ${e?.message || e}`);
     }
@@ -32,7 +33,8 @@ export default function Doctor() {
           <div key={r.id} className="card">
             <div className="row" style={{ justifyContent: "space-between" }}>
               <span><b>{r.title}</b> · patient {r.patient} <span className={`badge ${r.status}`}>{r.status === "none" ? "no access" : r.status}</span></span>
-              {r.status === "none" && <button onClick={() => post({ action: "request", recordId: r.id })}>Request access</button>}
+              {["none", "denied", "revoked"].includes(r.status) && <button onClick={() => post({ action: "request", recordId: r.id })}>Request access</button>}
+              {r.status === "pending" && <span className="muted">Waiting for patient approval</span>}
               {r.status === "approved" && !plain[r.id] && <button onClick={() => read(r)}>Decrypt & read</button>}
             </div>
             {plain[r.id] && <div className="plain" style={{ marginTop: 10 }}>{plain[r.id]}</div>}
