@@ -37,6 +37,7 @@ export default function Admin() {
               <span><b>{r.title}</b> · patient {r.patient}</span>
               <button className="danger" onClick={() => tryDecrypt(r)}>Try to decrypt</button>
             </div>
+            <p className="muted small-print">Ciphertext, exactly as stored in the hospital database:</p>
             <pre>{r.ciphertext}</pre>
             {result[r.id] && <p className={result[r.id].ok ? "plain" : "error"}>{result[r.id].text}</p>}
           </div>
