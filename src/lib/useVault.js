@@ -12,7 +12,8 @@ export function roleOf(hasRealmRole) {
 
 // secureFetch attaches the access token and a fresh DPoP proof, so a stolen token alone is useless.
 export function secureFetch(url, init) {
-  return IAMService.secureFetch(url, init);
+  // The SDK builds the DPoP proof from a URL object, so a relative path must be made absolute first.
+  return IAMService.secureFetch(new URL(url, window.location.origin).href, init);
 }
 
 // The realm's admin policy authorises signing a relationship policy. Fetched from TideCloak directly

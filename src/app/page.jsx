@@ -30,6 +30,7 @@ export default function Home() {
         ) : (
           <button onClick={() => login()}>Login with TideCloak</button>
         )}
+        <p className="muted small-print">Go to: <Link href="/patient">Patient</Link> · <Link href="/doctor">Doctor</Link> · <Link href="/admin">Hospital admin</Link></p>
       </div>
       <div className="grid3">
         <div className="card"><b>1 · Patient</b><p className="muted">Encrypts a record under a policy only they can open.</p></div>
