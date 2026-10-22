@@ -26,3 +26,11 @@ button.small { padding: 4px 10px; font-size: 12px; }
 .item { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid #eef2f7; }
 .log { font-size: 13px; padding: 4px 0; border-top: 1px solid #eef2f7; }
 h3 { margin-top: 0; }
+.brand { color: inherit; text-decoration: none; }
+h1 small { font-size: 15px; color: #66758a; font-weight: 500; }
+.hero h2 { margin-top: 0; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.card.inner { margin: 10px 0 0; padding: 10px 12px; }
+.banner { background: #fbeaea; border: 1px solid #f1c4c5; padding: 8px 12px; border-radius: 6px; }
+.small-print { font-size: 12px; margin-bottom: 0; }
+.plain { margin-top: 8px; }

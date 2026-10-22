@@ -1,7 +1,7 @@
 import "./globals.css";
 import Providers from "./providers";
 
-export const metadata = { title: "MedVault", description: "Patient-approved medical records, secured by TideCloak" };
+export const metadata = { title: "MedVault", description: "Patient-approved medical records, enforced by the Tide network" };
 
 export default function RootLayout({ children }) {
   return (

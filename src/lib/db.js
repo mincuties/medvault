@@ -1,14 +1,14 @@
 import fs from "fs";
 import path from "path";
 
-// Tiny JSON-file store. It only ever holds ciphertext, never plaintext records.
+// Tiny JSON-file store. It holds ciphertext and signed policies, never plaintext records.
 const FILE = path.join(process.cwd(), "data", "db.json");
 
 export function load() {
   try {
-    return JSON.parse(fs.readFileSync(FILE, "utf8"));
+    return { records: [], requests: [], policies: [], users: {}, audit: [], ...JSON.parse(fs.readFileSync(FILE, "utf8")) };
   } catch {
-    return { records: [], requests: [], audit: [] };
+    return { records: [], requests: [], policies: [], users: {}, audit: [] };
   }
 }
 
