@@ -6,7 +6,7 @@ MedVault is a medical record vault where a patient's file opens only when the pa
 
 ## Vision & originality
 
-Patients own their health records, not the hospital's IT team. A doctor gets access for one visit, with the patient's approval.
+Patients own their health records, not the hospital's IT team. A doctor gets access to one record, for one visit (24 hours), because the patient signed for it. The approval is not a row in our database: it is a cryptographic policy the Tide network checks on every decryption.
 
 ## Trust constraint insight
 
@@ -14,40 +14,41 @@ Today, whoever runs the database can read every record: admins, insiders, vendor
 
 ## Value & impact
 
-A patient with an HIV or mental health history can store it once and share it with a new specialist in seconds, knowing hospital staff can't browse it.
+A patient with an HIV or mental health history can store it once and share it with a new specialist in seconds, knowing hospital staff can't browse it, and can see in an access log every request, approval and read.
 
 ## Why TideCloak matters
 
-Records are encrypted in the browser with TideCloak's tag-based encryption (`doEncrypt` / `doDecrypt`, tag `medical`). The key is split across Tide's independent nodes, and they only help decrypt for a user whose TideCloak-signed token carries the `_tide_medical.selfdecrypt` role. There is no master key on our server, so the hospital admin, who runs the database, sees only ciphertext and gets refused when trying to decrypt. Ordinary login can't promise this, because whoever runs the database can read it. With TideCloak's quorum governance (IGA) turned on, even granting a decrypt role is a change request that needs admin quorum approval, so one rogue admin can't quietly give themselves access.
-
-**What is enforced where (honest note):** the Tide network enforces *who can decrypt at all* (role policy on the token). The patient's **Approve / Deny** decision is enforced by our app server: the server only releases a record's ciphertext to a doctor after that patient approves. Making the patient's approval itself a condition checked by the Tide network (a per-record Tide policy) is the next step; we did not build it in this prototype.
+Each record is encrypted in the patient's browser by the Tide network, under a policy using Tide's built-in `RelationshipAttestation:1` contract with the record's id as its only tag. When the patient approves a doctor, the patient signs (in the Tide enclave) a policy naming **that doctor's Tide key, that record, read-only, expiring in 24 hours**. Tide's independent nodes release a decryption only when the caller's token, its `_tide_decryptor` role and that signed policy all match. There is no master key on our server. The hospital admin holds the entire database, signed policies included, and replaying the doctor's policy is still refused by the network. Ordinary login can't promise this, because whoever runs the database can read it. Tokens are DPoP-bound and verified server side.
 
 ## Prototype & storytelling
 
-Patient uploads a record (encrypted before it leaves the browser), doctor requests access, patient approves, doctor decrypts and reads it. Then the hospital admin opens the same record and gets only encrypted data, and their decrypt attempt is refused.
+Patient uploads a record (signs a policy, then the data is encrypted before it leaves the browser). The doctor requests access, the patient approves by signing a grant, and the doctor decrypts and reads it. Then the hospital admin opens the same record, sees only ciphertext, and their decrypt attempt is refused by the Tide network.
+
+**Honest notes:** in this demo realm the patient is also the realm's `tide-realm-admin`, because signing a Tide policy needs that authority. In production each patient's grants would be signed through a governed approver flow. Revoking deletes the stored grant so the app stops handing it out; a 24-hour expiry bounds a copy that was kept.
 
 ## Setup
 
-Requirements: Node.js 20+, Docker Desktop.
+Requirements: Node.js 20+, Docker Desktop, Git Bash (Windows) with `jq` and `curl`.
 
-1. Start TideCloak with the MedVault realm imported (run in the project folder):
+1. Install and configure:
 
    ```bash
-   docker run -d --name tidecloak -p 8080:8080 -v "${PWD}/medvault-realm.json:/opt/keycloak/data/import/medvault-realm.json" -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=password tideorg/tidecloak-dev:latest
+   npm install
+   cp .env.example .env    # set KC_BOOTSTRAP_ADMIN_PASSWORD
    ```
 
-   The realm `medvault` comes with client `medvault-app`, roles `patient`, `doctor`, `hospital-admin` and `_tide_medical.selfencrypt` / `_tide_medical.selfdecrypt`, and users `patient1`, `doctor1`, `admin1`.
+2. Bootstrap TideCloak (Tide's official init script, extended for MedVault). It asks for your Tide licence email and your agreement to Tide's Terms & Conditions (https://tide.org/legal), starts `tideorg/tidecloak-dev`, creates the realm `medvault` with roles `patient`, `doctor`, `hospital-admin`, `_tide_encryptor`, `_tide_decryptor`, enables IGA, and creates users `patient`, `doctor` and `hospitaladmin`:
 
-2. Open http://localhost:8080 (admin / password), switch to realm **medvault**:
-   - Identity Providers → tide → **Manage License → Request License**.
-   - For each of `patient1`, `doctor1`, `admin1`: Users → user → Credentials → **Credential Reset** → action **Link Tide Account** → Copy link, open it in a private window and create/link a Tide account.
-   - Clients → medvault-app → Action → **Download adapter config** (Keycloak OIDC JSON). Save it as `tidecloak.json` in the project root (a copy in `public/` is fine too).
+   ```bash
+   REALM_NAME=medvault CLIENT_NAME=medvault-client npm run init
+   ```
+
+   It prints three invite links (`INVITE patient/doctor/hospitaladmin`). Open each in a private browser window and create or link a Tide account. The script then assigns roles, makes `patient` the realm's Tide admin and writes `data/tidecloak.json`.
 
 3. Run the app:
 
    ```bash
-   npm install
    npm run dev
    ```
 
-4. Open http://localhost:3000 and click **Login with TideCloak**. Each role lands on its own page (`/patient`, `/doctor`, `/admin`). Data is stored in `data/db.json` (synthetic data only, ciphertext only).
+4. Open http://localhost:3000 and click **Login with TideCloak**. Each role lands on its own page (`/patient`, `/doctor`, `/admin`). Allow pop-ups: signing a policy opens the Tide enclave. Data is stored in `data/db.json` (synthetic data only; ciphertext and signed policies only).
