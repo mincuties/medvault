@@ -1,0 +1,84 @@
+{
+  "realm": "medvault",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "duplicateEmailsAllowed": true,
+  "roles": {
+    "realm": [
+      { "name": "_tide_medical.selfencrypt", "description": "Tide E2EE encrypt medical records" },
+      { "name": "_tide_medical.selfdecrypt", "description": "Tide E2EE decrypt medical records" },
+      {
+        "name": "patient", "description": "MedVault patient", "composite": true,
+        "composites": { "realm": ["_tide_medical.selfencrypt", "_tide_medical.selfdecrypt"] }
+      },
+      {
+        "name": "doctor", "description": "MedVault doctor", "composite": true,
+        "composites": { "realm": ["_tide_medical.selfdecrypt"] }
+      },
+      { "name": "hospital-admin", "description": "Runs the hospital database. Holds no decrypt role." },
+      { "name": "default-roles-medvault", "description": "${role_default-roles}", "composite": true, "composites": { "realm": [] } }
+    ],
+    "client": { "medvault-app": [] }
+  },
+  "defaultRole": { "name": "default-roles-medvault", "description": "${role_default-roles}", "composite": true, "clientRole": false },
+  "users": [
+    { "username": "patient1", "email": "patient1@medvault.test", "firstName": "Pat", "lastName": "Nguyen", "enabled": true, "realmRoles": ["patient", "default-roles-medvault"] },
+    { "username": "doctor1", "email": "doctor1@medvault.test", "firstName": "Dana", "lastName": "Tran", "enabled": true, "realmRoles": ["doctor", "default-roles-medvault"] },
+    { "username": "admin1", "email": "admin1@medvault.test", "firstName": "Alex", "lastName": "Le", "enabled": true, "realmRoles": ["hospital-admin", "default-roles-medvault"] }
+  ],
+  "clients": [
+    {
+      "clientId": "medvault-app",
+      "enabled": true,
+      "redirectUris": ["http://localhost:3000/*"],
+      "webOrigins": ["http://localhost:3000"],
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "publicClient": true,
+      "fullScopeAllowed": true,
+      "protocolMappers": [
+        {
+          "name": "Tide User Key", "protocol": "openid-connect", "protocolMapper": "oidc-usermodel-attribute-mapper", "consentRequired": false,
+          "config": { "introspection.token.claim": "true", "userinfo.token.claim": "true", "user.attribute": "tideUserKey", "lightweight.claim": "true", "id.token.claim": "true", "access.token.claim": "true", "claim.name": "tideuserkey", "jsonType.label": "String" }
+        },
+        {
+          "name": "Tide IGA Role Mapper", "protocol": "openid-connect", "protocolMapper": "tide-roles-mapper", "consentRequired": false,
+          "config": { "lightweight.claim": "true", "access.token.claim": "true" }
+        },
+        {
+          "name": "Tide vuid", "protocol": "openid-connect", "protocolMapper": "oidc-usermodel-attribute-mapper", "consentRequired": false,
+          "config": { "introspection.token.claim": "true", "userinfo.token.claim": "true", "user.attribute": "vuid", "lightweight.claim": "true", "id.token.claim": "true", "access.token.claim": "true", "claim.name": "vuid", "jsonType.label": "String" }
+        }
+      ]
+    }
+  ],
+  "identityProviders": [
+    {
+      "alias": "tide", "providerId": "tide", "enabled": true,
+      "config": {
+        "changeSetEndpoint": "http://localhost:8080",
+        "LogoURL": "http://localhost:8080/realms/medvault/tide-idp-resources/images/LOGO",
+        "syncMode": "LEGACY",
+        "ImageURL": "http://localhost:8080/realms/medvault/tide-idp-resources/images/BACKGROUND_IMAGE",
+        "loginFormType": "cmkOnly",
+        "homeORKurl": "https://ork1.tideprotocol.com",
+        "clientSecret": "****"
+      }
+    }
+  ],
+  "authenticationFlows": [
+    {
+      "alias": "tidebrowser", "providerId": "basic-flow", "topLevel": true,
+      "authenticationExecutions": [
+        { "authenticator": "auth-cookie", "authenticatorFlow": false, "requirement": "ALTERNATIVE", "priority": 10, "userSetupAllowed": false },
+        { "authenticatorConfig": "tide browser", "authenticator": "identity-provider-redirector", "authenticatorFlow": false, "requirement": "ALTERNATIVE", "priority": 25, "userSetupAllowed": false }
+      ]
+    }
+  ],
+  "authenticatorConfig": [{ "alias": "tide browser", "config": { "defaultProvider": "tide" } }],
+  "browserFlow": "tidebrowser",
+  "requiredActions": [
+    { "alias": "link-tide-account-action", "name": "Link Tide Account", "providerId": "link-tide-account-action", "enabled": true }
+  ]
+}
